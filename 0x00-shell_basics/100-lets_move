@@ -1,2 +1,2 @@
 #!/bin/bash
-mv $(ls [A-Z]) /tmp/u
+mv $(ls [A-Z]*) /tmp/u
