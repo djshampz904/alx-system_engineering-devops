@@ -1,0 +1,1 @@
+Parsing characters script
