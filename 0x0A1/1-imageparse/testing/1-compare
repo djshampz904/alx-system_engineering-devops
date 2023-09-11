@@ -1,0 +1,12 @@
+#!/bin/bash
+
+num1=23 num2=43
+
+if [ $num1 -le $num2 ]; then
+	echo "$num1 is less than $num2";
+else
+	echo "$num2 is less than $num1"
+
+fi
+
+exit 0

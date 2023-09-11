@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo -e 'Enter either command 1, 2, or 3'
+
+read -p 'Enter you number: ' mynum
+
+case $mynum in
+        1) echo 'You selected 1';;
+        2) echo 'You selected 2';;
+        3) echo 'You selected 3';;
+        *) echo 'Invalid choice' && exit 1;;
+esac
+
+exit 0;

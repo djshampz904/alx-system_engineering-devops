@@ -1,0 +1,8 @@
+#!/bin/bash
+
+declare -a cars=('BMW' 'VOLVO' 'NISSAN' 'TOYOTA')
+
+
+echo ${cars[*]}
+
+exit 0
