@@ -38,12 +38,26 @@ fi
 
 echo -e "Scanning for $imagetype at $url"
 
+get_img_links()
+{
+	curl -s "$url" | grep -Eo "https://[^\"]*\.$imagetype" | sed 's/<[^>]\+//g'
+
+}
+
+links=$(get_img_links)
+
+if [ -z "$links" ]; then
+	echo "No images found"
+	exit 1
+fi
+
+img_found=$(echo "$links" | wc -l)
+duplicate_count=$(echo "$links" | sort | uniq -d | wc -l)
+
+echo "${img_found} ${GREEN}${imagetype}${NC} files detected at URL, which include ${RED}${duplicate_count}${NC} duplicate(s)"
+echo "Downloading unique files files . . . . . . . . . . . . . . . . . . . . . . . . ."
+
 current_datetime=$(date +'%Y_%m_%d_%H_%M')
 my_folder="${imagetype}_${current_datetime}"
 
-while IFS= read -r link;
-do
 
-	wget -q "$link" -P "$my_folder"
-
-done < <(curl -s "$url" | grep -Eo '(http|https)://[^"]+' | grep -o "https://[^\"]*\.$imagetype")
