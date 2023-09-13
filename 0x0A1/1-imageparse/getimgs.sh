@@ -1,5 +1,20 @@
 #!/bin/bash
 
+# I employed key commands and techniques from Modules 1-8 to craft this script. 
+# wget, curl, and sed work together to clean HTML content and extract image links.
+# The getopts command manages options, allowing for zip archiving.
+# User input is obtained via read, and formatting is enhanced using printf for colorful and organized output.
+# Various if statements validate user inputs, ensuring the presence of required arguments and supported image types.
+# awk is employed within the getsize function to convert file sizes into human-readable formats,
+# facilitating the generation of a detailed report.
+# The script utilizes loops (for and while) to iterate through image links and files.
+# It also counts duplicates to enhance efficiency.
+# Conditional statements guarantee proper execution and error handling throughout
+# Lastly, the script features functions like dwn_image to eliminate code redundancy and maintain clarity.
+# A dynamic naming scheme incorporates the current date and time, ensuring unique directories for each run.
+# This integration of commands and techniques culminates in a robust script
+# for downloading, reporting, and optionally archiving images from a given URL, offering user-friendliness and reliability.
+
 # Define color codes for formatting
 RED="\033[0;31m"
 GREEN="\033[0;32m"

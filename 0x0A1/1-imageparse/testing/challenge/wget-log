@@ -1,0 +1,24 @@
+--2023-09-13 10:25:01--  https://backiee.com/static/wpdb/wallpapers/portrait/608x1080/185850.jpg
+Resolving backiee.com (backiee.com)... 172.67.218.233, 104.21.38.44, 2606:4700:3030::ac43:dae9, ...
+Connecting to backiee.com (backiee.com)|172.67.218.233|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 181799 (178K) [image/jpeg]
+Saving to: ‘jpg_2023_09_13_10_25/185850.jpg’
+
+185850.jpg                        32%[=================>                                       ]  58.06K  --.-KB/s    eta 8h 18m 185850.jpg                        32%[=================>                                       ]  58.06K  --.-KB/s    in 4h 2m   
+
+2023-09-13 14:27:25 (4.09 B/s) - Read error at byte 59455/181799 (Connection timed out). Retrying.
+
+--2023-09-13 14:27:26--  (try: 2)  https://backiee.com/static/wpdb/wallpapers/portrait/608x1080/185850.jpg
+Connecting to backiee.com (backiee.com)|172.67.218.233|:443... connected.
+HTTP request sent, awaiting response... 206 Partial Content
+Length: 181799 (178K), 122344 (119K) remaining [image/jpeg]
+Saving to: ‘jpg_2023_09_13_10_25/185850.jpg’
+
+        [ skipping 50K ]
+    50K ,,,,,,,,.. .......... .......... .......... .......... 56% 1.12M 0s
+   100K .......... .......... .......... .......... .......... 84%  217K 0s
+   150K .......... .......... .......                         100% 1.74M=0.3s
+
+2023-09-13 14:27:28 (412 KB/s) - ‘jpg_2023_09_13_10_25/185850.jpg’ saved [181799/181799]
+
