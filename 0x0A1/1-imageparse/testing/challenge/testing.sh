@@ -15,14 +15,12 @@ do
 
                 :) zip_file=0;;
 
-                *) echo -e "${OPTERR}"
-                   exit 1;;
+                *) printf "${OPTERR}\n"; exit 1;;
         esac
 done
 
 if [ $# -gt $((OPTIND - 1)) ]; then
-        echo -e "${OPTERR}"
-        exit 1
+        printf "${OPTERR}\n"; exit 1
 fi
 
 read -p "Enter a URL and image file type, e.g., http://somedomain.com jpg: " url imagetype
@@ -31,24 +29,24 @@ url=$(echo $url | sed 's/^[ \t]*//;s/[ \t]*$//')  # Remove leading/trailing whit
 imagetype=$(echo $imagetype | sed 's/^[ \t]*//;s/[ \t]*$//')
 
 if [ -z "$imagetype" ] || [ -z "$url" ]; then
-        echo "${RED}One or more arguments have not been provided. Exiting...${NC}"
+        printf "${RED}One or more arguments have not been provided. Exiting...${NC}\n"
         exit 1
 elif ! [[ "$imagetype" == "jpg" || "$imagetype" == "jpeg" || "$imagetype" == "gif" || "$imagetype" == "png" ]]; then
-        echo "${RED}Unsupported image type entered. Exiting...${NC}"
+        printf "${RED}Unsupported image type entered. Exiting...${NC}\n"
         exit 1
 fi
 
-echo -e "Scanning for $imagetype at $url"
+printf "Scanning for $imagetype at $url\n"
 
 get_img_links()
 {
-        curl -s "$url" | grep -Eo "https://[^\"]*\.$imagetype" | sed 's/<[^>]\+//g'
+        curl -s "$url" | grep -Eo "https://[^\"]*\.$imagetype" | sed "s/<[^>]\+//g"
 }
 
 links=$(get_img_links)
 
 if [ -z "$links" ]; then
-        echo "${RED}No images found${NC}"
+        printf "${RED}No images found${NC}\n"
         exit 1
 fi
 
@@ -56,7 +54,7 @@ img_found=$(echo "$links" | wc -l)
 unique_links=$(echo "$links" | sort | uniq)
 duplicate_count=$(echo "$links" | sort | uniq -d | wc -l)
 
-echo "$img_found $imagetype files detected at URL, which include $duplicate_count duplicate(s)"
+printf "$img_found ${GREEN}$imagetype${NC} files detected at URL, which include ${RED}$duplicate_count${NC} duplicate(s)\n"
 
 current_datetime=$(date +'%Y_%m_%d_%H_%M')
 my_folder="${imagetype}_${current_datetime}"
@@ -64,9 +62,10 @@ download_count=0
 
 dwn_image()
 {
-        wget -q -P $2 $1
+	
+        wget -P $2 $1
         if [ $? -ne 0 ]; then
-            echo "${RED}Failed to download: $1${NC}"
+            printf "${RED}Failed to download: $1${NC}\n"
         else
             ((download_count++))
         fi
@@ -76,7 +75,7 @@ for link in ${unique_links}; do
         dwn_image $link "$my_folder"
 done
 
-echo "Download completed: $download_count $imagetype files have been downloaded to the directory $my_folder"
+printf "Download completed: $download_count $imagetype files have been downloaded to the directory ${GREEN}$my_folder${NC}\n"
 
 if [ ${zip_file} -eq 1 ]; then
         myzip="zip -r $my_folder $my_folder"
