@@ -56,14 +56,14 @@ duplicate_count=$(echo "$links" | sort | uniq -d | wc -l)
 
 printf "$img_found ${GREEN}$imagetype${NC} files detected at URL, which include ${RED}$duplicate_count${NC} duplicate(s)\n"
 
-current_datetime=$(date +'%Y_%m_%d_%H_%M')
+current_datetime=$(date +'%Y_%m_%d_%H_%M_%S')
 my_folder="${imagetype}_${current_datetime}"
 download_count=0
 
 dwn_image()
 {
 	
-        wget -P $2 $1
+        wget -q -P $2 $1
         if [ $? -ne 0 ]; then
             printf "${RED}Failed to download: $1${NC}\n"
         else
@@ -75,11 +75,12 @@ for link in ${unique_links}; do
         dwn_image $link "$my_folder"
 done
 
-printf "Download completed: $download_count $imagetype files have been downloaded to the directory ${GREEN}$my_folder${NC}\n"
+printf "$download_count $imagetype files have been downloaded to the directory ${GREEN}$my_folder${NC}\n"
 
 if [ ${zip_file} -eq 1 ]; then
-        myzip="zip -r $my_folder $my_folder"
-fi
+        zip -r "$my_folder/$my_folder.zip" $my_folder > /dev/null 2>&1
+	printf "${GREEN}$download_count${NC} $imagetype files archived to ${GREEN}$my_folder.zip${NC} in the ${GREEN}$my_folder${NC} directory\n"
+fi 
 
 exit 0
 
