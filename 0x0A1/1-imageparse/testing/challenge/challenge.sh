@@ -47,17 +47,34 @@ get_img_links()
 links=$(get_img_links)
 
 if [ -z "$links" ]; then
-	echo "No images found"
+	echo "${RED}No images found${NC}"
 	exit 1
 fi
 
 img_found=$(echo "$links" | wc -l)
+unique_links=$(echo "$links" | sort | uniq)
 duplicate_count=$(echo "$links" | sort | uniq -d | wc -l)
 
-echo "${img_found} ${GREEN}${imagetype}${NC} files detected at URL, which include ${RED}${duplicate_count}${NC} duplicate(s)"
+echo "$img_found $imagetype files detected at URL, which include $duplicate_count duplicate(s)"
 echo "Downloading unique files files . . . . . . . . . . . . . . . . . . . . . . . . ."
 
 current_datetime=$(date +'%Y_%m_%d_%H_%M')
 my_folder="${imagetype}_${current_datetime}"
+download_count=0
 
+dwn_image() 
+{
+	wget -q -P $2 $1
+}
+for link in ${unique_links};do
+	dwn_image $link $my_folder
+done
+
+
+downloaded_files=$(ls -l "$my_folder" | wc -l)
+echo "$downloaded_files $imagetype files have been downloaded to the directory $my_folder"
+
+if [ ${zip_file} -eq 1 ]; then
+	myzip="zip -r $my_folder $my_folder"
+fi
 
