@@ -67,19 +67,28 @@ get_img_links()
     curl -s "$url" | grep -Eo "https://[^\"]*\.$imagetype" | sed "s/<[^>]\+//g"
 }
 
-# Process command line options -z to create zip file in the directory
-while getopts ':z' opt
-do
-    case $opt in
-        z) zip_file=1;;
-        :) zip_file=0;;
-        *) printf "${OPTERR}\n"; exit 1;;
-    esac
+# Check if zip_file is not 1, which means -z was not provided
+if [[ $# -gt 0 ]]; then
+	while getopts ":z" opt;
+	do
+		case $opt in
+			z) zip_file=1;;
+			*) printf "$OPTERR\n"; exit 1;;
+		esac
+	done
+fi
+
+args=()
+#Get any other argument provided thats not -z and put it in an array
+for arg in "$@"; do
+	if [ "$arg" != "-z" ]; then
+		args+=("$arg")
+	fi
 done
 
-#if there are arguments supplied it will exit showing are error as only -z option is allowed
-if [ $# -gt $((OPTIND - 1)) ]; then
-	    printf "${OPTERR}\n"; exit 1
+#if any other argument is found the script will exit
+if [ ${#args[@]} -gt 0 ]; then
+	printf "${OPTERR}\n"; exit 1
 fi
 
 # Prompt the user for the URL and image type
