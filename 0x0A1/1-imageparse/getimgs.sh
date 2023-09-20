@@ -29,6 +29,7 @@ imagetype=""
 current_datetime=""
 my_folder=""
 download_count=0
+img_types=("jpg" "jpeg" "gif" "png")
 
 # Function to format file size in human-readable format
 getsize()
@@ -77,13 +78,12 @@ do
 done
 
 #if there are arguments supplied it will exit showing are error as only -z option is allowed
-if [ $# -gt $((OPTIND - 1)) ]; then
-    printf "${OPTERR}\n"; exit 1
-fi
+#if [ $# -gt $((OPTIND - 1)) ]; then
+#    printf "${OPTERR}\n"; exit 1
+#fi
 
 # Prompt the user for the URL and image type
-read -p "Enter a URL: " url
-read -p "Enter an image file type (jpg, jpeg, gif, or png): " imagetype
+read -p "Enter a URL and image file type, e.g. http://somedomain.com jpg: " url imagetype
 
 # Trim leading/trailing whitespace from user input
 url=$(echo "$url" | sed 's/^[ \t]*//;s/[ \t]*$//')
@@ -93,7 +93,7 @@ imagetype=$(echo "$imagetype" | sed 's/^[ \t]*//;s/[ \t]*$//')
 if [ -z "$imagetype" ] || [ -z "$url" ]; then
     printf "${RED}One or more arguments have not been provided. Exiting...${NC}\n"
     exit 1
-elif ! [[ "$imagetype" == "jpg" || "$imagetype" == "jpeg" || "$imagetype" == "gif" || "$imagetype" == "png" ]]; then
+elif ! [[ "${img_types[*]}" == *"$imagetype"* ]]; then
     printf "${RED}Unsupported image type entered. Exiting...${NC}\n"
     exit 1
 fi
@@ -143,7 +143,7 @@ done
 
 if [ ${zip_file} -eq 1 ]; then
     # Create a zip archive of downloaded images
-    zip -r "$my_folder/$my_folder.zip" "$my_folder" > /dev/null 2>&1 #Direct output of command to null stderr to quite it
+    zip -q -r "$my_folder/$my_folder.zip" "$my_folder"
     printf "${GREEN}$download_count${NC} $imagetype files archived to ${GREEN}$my_folder.zip${NC} in the ${GREEN}$my_folder${NC} directory\n"
 fi 
 
