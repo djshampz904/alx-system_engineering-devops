@@ -78,9 +78,9 @@ do
 done
 
 #if there are arguments supplied it will exit showing are error as only -z option is allowed
-#if [ $# -gt $((OPTIND - 1)) ]; then
-#    printf "${OPTERR}\n"; exit 1
-#fi
+if [ $# -gt $((OPTIND - 1)) ]; then
+	    printf "${OPTERR}\n"; exit 1
+fi
 
 # Prompt the user for the URL and image type
 read -p "Enter a URL and image file type, e.g. http://somedomain.com jpg: " url imagetype
