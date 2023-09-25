@@ -153,11 +153,33 @@ printf "$img_found ${GREEN}$imagetype${NC} files detected at URL, which include 
 
 # Create a unique directory for storing downloaded images
 current_datetime=$(date +'%Y_%m_%d_%H_%M_%S') #Use date time to the second so to always generate unique name of file
-my_folder="${imagetype}_${current_datetime}" #create folder name
+if ! [ $alltype -eq 1 ]; then
+	my_folder="${imagetype}_${current_datetime}" #create folder name
+else
+	jpg_folder="jpg_${current_datetime}"
+	gif_folder="gif_${current_datetime}"
+	jpeg_folder="jpeg_${current_datetime}"
+	png_folder="png_${current_datetime}"
+fi
+
 
 # Download unique images
 for link in ${unique_links}; do
-    dwn_image "$link" "$my_folder"
+	if ! [ $alltype -eq 1 ]; then
+		dwn_image "$link" "$my_folder"
+	else
+		case "$link" in
+			*.jpg) dwn_image "$link" "$jpg_folder"
+				;;
+			*.jpeg) dwn_image "$link" "$jpeg_folder"
+				;;
+			*.gif)dwn_image "$link" "$gif_folder"
+				;;
+			*.png)dwn_image "$link" "$png_folder"
+				;;
+        esac
+
+	fi
 done
 
 printf "$download_count ${GREEN}$imagetype${NC} files have been downloaded to the directory ${GREEN}$my_folder${NC}\n"
@@ -167,19 +189,48 @@ printf "${BLUE}FILE NAME                                          FILE SIZE${NC}
 printf "%-50s %-20s\n" "--------------------------------------------------" "--------------------"
 
 #loop through the created directory and select file and file size
-for file in "$my_folder"/*; do
-    fname=$(basename "$file")
-    if [ ${#fname} -gt 30 ]; then #If the name is longer than 30 characters trim it down to 30 fit the table
-        fname=${fname:0:27}"..." 
-    fi
-    fsize=$(getsize $(du -b "$file" | cut -f 1))
-    printf "%-50s |  %-20s\n" "$fname" "$fsize"
-done
+if ! [ $alltype -eq 1 ]; then
+	for file in "$my_folder"/*; do
+		fname=$(basename "$file")
+		if [ ${#fname} -gt 30 ]; then #If the name is longer than 30 characters trim it down to 30 fit the table
+			fname=${fname:0:27}"..." 
+		fi
+		fsize=$(getsize $(du -b "$file" | cut -f 1))
+		printf "%-50s |  %-20s\n" "$fname" "$fsize"
+	done
+else
+	for folder_name in "$jpg_folder" "$gif_folder" "$jpeg_folder" "$png_folder";
+	do
+		if [ -d "$folder_name" ]; then
+			for file in "$folder_name"/*;
+			do
+				fname=$(basename "$file")
+				if [ ${#fname} -gt 30 ]; then
+					fname=${fname:0:27}"..."
+				fi
+				fsize=$(getsize $(du -b "$file" | cut -f 1))
+				printf "%-50s |  %-20s\n" "$fname" "$fsize"
+			done
+		fi
+	done
+fi
 
 if [ ${zip_file} -eq 1 ]; then
-    # Create a zip archive of downloaded images
-    zip -q -r "$my_folder/$my_folder.zip" "$my_folder"
-    printf "${GREEN}$download_count${NC} $imagetype files archived to ${GREEN}$my_folder.zip${NC} in the ${GREEN}$my_folder${NC} directory\n"
-fi 
+	if ! [ $alltype -eq 1 ]; then
+		# Create a zip archive of downloaded images
+		zip -q -r "$my_folder/$my_folder.zip" "$my_folder"
+		printf "${GREEN}$download_count${NC} $imagetype files archived to ${GREEN}$my_folder.zip${NC} in the ${GREEN}$my_folder${NC} directory\n"
+	else
+		for folder_name in "$jpg_folder" "$gif_folder" "$jpeg_folder" "$png_folder";
+		do
+			if [ -d "$folder_name" ]; then
+				folder_type=$(basename "$folder_name")
+				zip -q -r "$folder_name/$folder_name.zip" "$folder_name"
+				printf "${GREEN}$download_count${NC} $folder_type files archived to ${GREEN}$folder_name.zip${NC} in the ${GREEN}$folder_name${NC} directory\n"
+
+			fi
+		done
+	fi
+fi	
 
 exit 0
