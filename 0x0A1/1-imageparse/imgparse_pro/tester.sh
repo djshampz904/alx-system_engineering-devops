@@ -1,19 +1,23 @@
 #!/bin/bash
 
-# I employed key commands and techniques from Modules 1-8 to craft this script. 
-# wget, curl, and sed work together to clean HTML content and extract image links.
-# The getopts command manages options, allowing for zip archiving.
-# User input is obtained via read, and formatting is enhanced using printf for colorful and organized output.
-# Various if statements validate user inputs, ensuring the presence of required arguments and supported image types.
-# awk is employed within the getsize function to convert file sizes into human-readable formats,
-# facilitating the generation of a detailed report.
-# The script utilizes loops (for and while) to iterate through image links and files.
-# It also counts duplicates to enhance efficiency.
-# Conditional statements guarantee proper execution and error handling throughout
-# Lastly, the script features functions like dwn_image to eliminate code redundancy and maintain clarity.
-# A dynamic naming scheme incorporates the current date and time, ensuring unique directories for each run.
-# This integration of commands and techniques culminates in a robust script
-# for downloading, reporting, and optionally archiving images from a given URL, offering user-friendliness and reliability.
+# In crafting this script, I approached the problem methodically and systematically, drawing from various key commands and techniques learned from Modules 1-8.
+# My objective was to create a robust and user-friendly tool for downloading, reporting, and optionally archiving images from a given URL.
+# To achieve this, I employed a series of strategies. I began by utilizing the getopts command to manage options,
+# allowing users to specify whether they want to archive images and/or delete downloaded folders. I also utilized read to gather user input,
+# ensuring the script is adaptable to various scenarios. I implemented multiple conditional statements to validate user inputs.
+# These checks include ensuring the presence of required arguments, supported image types, and proper usage of options.
+# If an error occurs, the script provides clear error messages and exits gracefully. To extract image links from the provided URL,
+# I used curl to fetch the HTML content and grep and sed to filter and clean the links. This step ensures that only valid image links are processed.
+# I created the dwn_image function to eliminate code redundancy and ensure a clean and structured script.
+# This function uses wget to download images while maintaining a count of successful downloads. 
+# To prevent conflicts and ensure uniqueness, I generated directory names based on the current date and time.
+# This dynamic naming scheme guarantees that each run of the script creates a distinct folder for downloaded images,
+# I included a getsize function that converts file sizes into human-readable formats, enhancing the clarity of the generated report.
+# I crafted a detailed report that displays the number of downloaded images, their names, and sizes.
+# The report includes dynamic column widths to accommodate various file names and sizes.For archiving functionality,
+# I provided options to create zip archives of downloaded images.
+# The script supports both archiving all images into a single zip file and individual zip files for each image type.
+# To enhance readability and aesthetics, I employed color codes for formatting the script's output.
 
 # Define color codes for formatting
 RED="\033[0;31m"
@@ -109,6 +113,8 @@ if [[ $# -gt 0 ]]; then
 	done
 fi
 
+
+# Check for any option mis match
 if [ $delete_flag -eq 1 ] && ([ $zip_file -eq 1 ] || [ $alltype -eq 1 ]); then
     printf "${RED}-d option cannot be used in conjunction with -z or -a options. Exiting...${NC}\n"
     exit 1
@@ -216,7 +222,7 @@ else
 fi
 
 
-# Download unique images
+# Download unique images iinto their respective folders
 for link in ${unique_links}; do
 	if ! [ $alltype -eq 1 ]; then
 		dwn_image "$link" "$my_folder"
@@ -321,7 +327,7 @@ printf "${GREEN}Total Size: %-70s${NC}\n" "$total_size_display"
 
 
 
-
+# zip report for all the files
 if [ ${zip_file} -eq 1 ]; then
     if ! [ $alltype -eq 1 ]; then
         # Create a zip archive of downloaded images
