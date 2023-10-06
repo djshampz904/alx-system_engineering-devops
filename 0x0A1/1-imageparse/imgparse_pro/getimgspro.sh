@@ -177,7 +177,7 @@ for link in ${unique_links}; do
 				;;
 			*.png)dwn_image "$link" "$png_folder"
 				;;
-        esac
+		esac
 
 	fi
 done
