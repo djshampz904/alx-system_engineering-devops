@@ -1,28 +1,12 @@
 #!/bin/bash
 
-# I employed key commands and techniques from Modules 1-8 to craft this script. 
-# wget, curl, and sed work together to clean HTML content and extract image links.
-# The getopts command manages options, allowing for zip archiving.
-# User input is obtained via read, and formatting is enhanced using printf for colorful and organized output.
-# Various if statements validate user inputs, ensuring the presence of required arguments and supported image types.
-# awk is employed within the getsize function to convert file sizes into human-readable formats,
-# facilitating the generation of a detailed report.
-# The script utilizes loops (for and while) to iterate through image links and files.
-# It also counts duplicates to enhance efficiency.
-# Conditional statements guarantee proper execution and error handling throughout
-# Lastly, the script features functions like dwn_image to eliminate code redundancy and maintain clarity.
-# A dynamic naming scheme incorporates the current date and time, ensuring unique directories for each run.
-# This integration of commands and techniques culminates in a robust script
-# for downloading, reporting, and optionally archiving images from a given URL, offering user-friendliness and reliability.
-
 # Define color codes for formatting
 RED="\033[0;31m"
 GREEN="\033[0;32m"
 BLUE="\033[0;34m"
 NC="\033[0m"
-
-# Initialize variables
 zip_file=0
+delete_flag=0
 OPTERR="${RED}Invalid option or missing argument error - exiting ...${NC}"
 url=""
 imagetype=""
@@ -52,7 +36,6 @@ getsize()
 # Function to download an image
 dwn_image()
 {
-    # Download an image using wget options for silencing wget and getting creating or directing it to the directory
     wget -q -P "$2" "$1" 
     if [ $? -ne 0 ]; then  #check if the download was successful
         printf "${RED}Failed to download: $1${NC}\n"
@@ -61,16 +44,27 @@ dwn_image()
     fi
 }
 
+format_size()
+{
+    local size=$1
+    local unit=("b" "Kb" "Mb" "Gb" "Tb")
+    local unit_index=0
+    while [ $size -ge 1024 ] && [ $unit_index -lt 4 ]; do
+        size=$((size / 1024))
+        ((unit_index++))
+    done
+    echo "$size${unit[$unit_index]}"
+}
+
 # Function to fetch image links from the provided URL
 get_img_links()
 {
-		# Use curl to fetch the HTML content, then grep for image links only returning links that end with "." and the image type
 		curl -s "$url" | grep -Eo "https://[^\"]*\.$imagetype" | sed "s/<[^>]\+//g"
 }
 
 # Check if zip_file is not 1, which means -z was not provided
 if [[ $# -gt 0 ]]; then
-	while getopts ":za" opt;
+	while getopts ":zad" opt;
 	do
 		case $opt in
 			z) zip_file=1;;
@@ -86,11 +80,49 @@ if [[ $# -gt 0 ]]; then
 				imagetype=${imagetype%|}
 				imagetype+=")"
 				;;
+			d) delete_flag=1
+				;;
 
 			*) printf "$OPTERR\n"; exit 1;;
 		esac
 	done
 fi
+
+if [ $delete_flag -eq 1 ] && ([ $zip_file -eq 1 ] || [ $alltype -eq 1 ]);then
+	printf "${RED}-d option cannot be used in conjunction with -z or -a options. Exiting...${NC}\n"
+	exit 1
+fi
+
+if [ $delete_flag -eq 1 ]; then
+    printf "Deleting folders with downloaded images...\n"
+
+# List folders in the current working directory that contain downloaded image files
+folders_to_delete=$(find . -maxdepth 1 -type d -exec sh -c '[ -n "$(find "{}" -maxdepth 1 -name "*.jpg" -o -name "*.jpeg" -o -name "*.gif" -o -name "*.png")" ]' \; -print)
+# Display the list of folders
+    if [ -z "$folders_to_delete" ]; then
+        printf "No folders with downloaded image files found.\n"
+    else
+        printf "Folders with downloaded image files:\n"
+        echo "$folders_to_delete"
+        
+        # Prompt the user for deletion options
+        read -p "Enter 'a' to delete all folders or enter the folder name(s) to delete: " user_input
+
+        if [ "$user_input" = "a" ]; then
+            # Delete all folders
+            echo "$folders_to_delete" | xargs rm -r
+            printf "All folders with downloaded image files deleted.\n"
+        else
+            # Delete selected folder(s)
+            echo "$user_input" | xargs rm -r
+            printf "Selected folder(s) with downloaded image files deleted.\n"
+        fi
+    fi
+
+    # Exit the script after handling the -d option
+    exit 0
+fi
+
 
 echo "$imagetype";
 
@@ -156,81 +188,92 @@ current_datetime=$(date +'%Y_%m_%d_%H_%M_%S') #Use date time to the second so to
 if ! [ $alltype -eq 1 ]; then
 	my_folder="${imagetype}_${current_datetime}" #create folder name
 else
-	jpg_folder="jpg_${current_datetime}"
-	gif_folder="gif_${current_datetime}"
-	jpeg_folder="jpeg_${current_datetime}"
-	png_folder="png_${current_datetime}"
+	my_folder="alltype_${current_datetime}"
 fi
 
 
 # Download unique images
 for link in ${unique_links}; do
-	if ! [ $alltype -eq 1 ]; then
-		dwn_image "$link" "$my_folder"
-	else
-		case "$link" in
-			*.jpg) dwn_image "$link" "$jpg_folder"
-				;;
-			*.jpeg) dwn_image "$link" "$jpeg_folder"
-				;;
-			*.gif)dwn_image "$link" "$gif_folder"
-				;;
-			*.png)dwn_image "$link" "$png_folder"
-				;;
-		esac
-
-	fi
+	dwn_image "$link" "$my_folder"
 done
 
 printf "$download_count ${GREEN}$imagetype${NC} files have been downloaded to the directory ${GREEN}$my_folder${NC}\n"
 
-# Display a table of downloaded image files and their sizes
-printf "${BLUE}FILE NAME                                          FILE SIZE${NC}\n"
-printf "%-50s %-20s\n" "--------------------------------------------------" "--------------------"
+# Sort the associative array by file size in descending order
+sorted_files=($(for key in "${!file_sizes[@]}"; do
+    echo "$key:${file_sizes["$key"]}"
+done | sort -t':' -k2 -rn | cut -d':' -f1))
 
-#loop through the created directory and select file and file size
-if ! [ $alltype -eq 1 ]; then
-	for file in "$my_folder"/*; do
-		fname=$(basename "$file")
-		if [ ${#fname} -gt 30 ]; then #If the name is longer than 30 characters trim it down to 30 fit the table
-			fname=${fname:0:27}"..." 
-		fi
-		fsize=$(getsize $(du -b "$file" | cut -f 1))
-		printf "%-50s |  %-20s\n" "$fname" "$fsize"
-	done
-else
-	for folder_name in "$jpg_folder" "$gif_folder" "$jpeg_folder" "$png_folder";
-	do
-		if [ -d "$folder_name" ]; then
-			for file in "$folder_name"/*;
-			do
-				fname=$(basename "$file")
-				if [ ${#fname} -gt 30 ]; then
-					fname=${fname:0:27}"..."
-				fi
-				fsize=$(getsize $(du -b "$file" | cut -f 1))
-				printf "%-50s |  %-20s\n" "$fname" "$fsize"
-			done
-		fi
-	done
-fi
+# Calculate the total size of all downloaded image files
+total_size=0
+for fname in "${sorted_files[@]}"; do
+    size=${file_sizes["$fname"]}
+    total_size=$((total_size + size))
+done
+
+# Create an associative array to store file names and sizes for sorting
+declare -A file_sizes
+max_name_length=0  # Initialize max_name_length to 0
+
+# Calculate maximum column widths
+for fname in "${sorted_files[@]}"; do
+    fsize=${file_sizes["$fname"]}
+    name_width=${#fname}
+    size_width=${#fsize}
+
+    # Update maximum column widths if needed
+    if [ $name_width -gt $max_name_width ]; then
+        max_name_width=$name_width
+    fi
+    if [ $size_width -gt $max_size_width ]; then
+        max_size_width=$size_width
+    fi
+done
+
+# Loop through the created directory and select file and file size
+for file in "$my_folder"/*; do
+	fname=$(basename "$file")
+        fsize=$(du -b "$file" | cut -f 1)
+        file_sizes["$fname"]=$fsize
+
+        # Calculate the maximum file name length
+        if [ ${#fname} -gt $max_name_length ]; then
+            max_name_length=${#fname}
+        fi
+done
+
+# Sort the associative array by file size in descending order
+sorted_files=($(for key in "${!file_sizes[@]}"; do
+    echo "$key:${file_sizes["$key"]}"
+done | sort -t':' -k2 -rn | cut -d':' -f1))
+
+# Calculate the total size of all downloaded image files
+total_size=0
+for fname in "${sorted_files[@]}"; do
+    size=${file_sizes["$fname"]}
+    total_size=$((total_size + size))
+done
+
+printf "${BLUE}FILE NAME%-${max_name_length}s FILE SIZE${NC}\n"
+printf "%-${max_name_length}s %-${max_name_length}s\n" "$(printf -- '-%.0s' $(seq 1 $max_name_length))" "$(printf -- '-%.0s' $(seq 1 $(($max_name_length / 2))))"
+
+# Display the sorted files and sizes
+for fname in "${sorted_files[@]}"; do
+    fsize=${file_sizes["$fname"]}
+    fname_display=$(printf "%-${max_name_length}s" "$fname")  # Dynamic width, always 5 characters wider than the longest file name
+    fsize_display=$(format_size "$fsize")
+    printf "%s |  %s\n" "$fname_display" "$fsize_display"
+done
+
+# Display the total size
+total_size_display=$(format_size "$total_size")
+printf "${GREEN}Total Size: %-70s${NC}\n" "$total_size_display"
+
 
 if [ ${zip_file} -eq 1 ]; then
-	if ! [ $alltype -eq 1 ]; then
-		# Create a zip archive of downloaded images
-		zip -q -r "$my_folder/$my_folder.zip" "$my_folder"
-		printf "${GREEN}$download_count${NC} $imagetype files archived to ${GREEN}$my_folder.zip${NC} in the ${GREEN}$my_folder${NC} directory\n"
-	else
-		for folder_name in "$jpg_folder" "$gif_folder" "$jpeg_folder" "$png_folder";
-		do
-			if [ -d "$folder_name" ]; then
-				folder_type=$(basename "$folder_name")
-				zip -q -r "$folder_name/$folder_name.zip" "$folder_name"
-				printf "${GREEN}$download_count${NC} $folder_type files archived to ${GREEN}$folder_name.zip${NC} in the ${GREEN}$folder_name${NC} directory\n"
-
-			fi
-		done
-	fi
+	# Create a zip archive of downloaded images
+	zip -q -r "$my_folder/$my_folder.zip" "$my_folder"
+	printf "${GREEN}$download_count${NC} $imagetype files archived to ${GREEN}$my_folder.zip${NC} in the ${GREEN}$my_folder${NC} directory\n"
 fi	
 
 exit 0

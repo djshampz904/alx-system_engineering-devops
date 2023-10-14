@@ -1,24 +1,5 @@
 #!/bin/bash
 
-# In crafting this script, I approached the problem methodically and systematically, drawing from various key commands and techniques learned from Modules 1-8.
-# My objective was to create a robust and user-friendly tool for downloading, reporting, and optionally archiving images from a given URL.
-# To achieve this, I employed a series of strategies. I began by utilizing the getopts command to manage options,
-# allowing users to specify whether they want to archive images and/or delete downloaded folders. I also utilized read to gather user input,
-# ensuring the script is adaptable to various scenarios. I implemented multiple conditional statements to validate user inputs.
-# These checks include ensuring the presence of required arguments, supported image types, and proper usage of options.
-# If an error occurs, the script provides clear error messages and exits gracefully. To extract image links from the provided URL,
-# I used curl to fetch the HTML content and grep and sed to filter and clean the links. This step ensures that only valid image links are processed.
-# I created the dwn_image function to eliminate code redundancy and ensure a clean and structured script.
-# This function uses wget to download images while maintaining a count of successful downloads. 
-# To prevent conflicts and ensure uniqueness, I generated directory names based on the current date and time.
-# This dynamic naming scheme guarantees that each run of the script creates a distinct folder for downloaded images,
-# I included a getsize function that converts file sizes into human-readable formats, enhancing the clarity of the generated report.
-# I crafted a detailed report that displays the number of downloaded images, their names, and sizes.
-# The report includes dynamic column widths to accommodate various file names and sizes.For archiving functionality,
-# I provided options to create zip archives of downloaded images.
-# The script supports both archiving all images into a single zip file and individual zip files for each image type.
-# To enhance readability and aesthetics, I employed color codes for formatting the script's output.
-
 # Define color codes for formatting
 RED="\033[0;31m"
 GREEN="\033[0;32m"
