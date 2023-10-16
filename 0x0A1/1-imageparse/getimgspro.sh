@@ -199,17 +199,6 @@ done
 
 printf "$download_count ${GREEN}$imagetype${NC} files have been downloaded to the directory ${GREEN}$my_folder${NC}\n"
 
-# Sort the associative array by file size in descending order
-sorted_files=($(for key in "${!file_sizes[@]}"; do
-    echo "$key:${file_sizes["$key"]}"
-done | sort -t':' -k2 -rn | cut -d':' -f1))
-
-# Calculate the total size of all downloaded image files
-total_size=0
-for fname in "${sorted_files[@]}"; do
-    size=${file_sizes["$fname"]}
-    total_size=$((total_size + size))
-done
 
 # Create an associative array to store file names and sizes for sorting
 declare -A file_sizes
