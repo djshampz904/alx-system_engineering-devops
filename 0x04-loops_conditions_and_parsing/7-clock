@@ -8,7 +8,7 @@
 # You must use the while loop (for and until are forbidden)
 hours=0
 
-while [ $hours -le 12 ]
+while [ "$hours" -le 12 ]
 do
     echo "Hour: $hours"
     minutes=1
