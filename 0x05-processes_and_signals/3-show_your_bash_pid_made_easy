@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 # Show pid of bash without using ps
 
-pgrep -l bash
+pgrep -lx bash
