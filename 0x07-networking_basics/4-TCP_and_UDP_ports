@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# List litsening ports and the pid of the processes using them
+ss -lp
