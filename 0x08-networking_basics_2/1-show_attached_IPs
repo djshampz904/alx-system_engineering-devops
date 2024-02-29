@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 # Displays all acive IPv4 addresses on the machine.
 
-ifconfig | grep -Eo "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b"
+ip add show |  grep -Eo "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b"
