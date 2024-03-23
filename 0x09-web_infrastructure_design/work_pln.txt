@@ -1,0 +1,77 @@
+Q1 A lot of websites are powered by simple web infrastructure, a lot of time it is composed of a single server with a LAMP stack.
+
+   On a whiteboard, design a one server web infrastructure that hosts the website that is reachable via www.foobar.com. Start your explanation by having a user wanting to access your website.
+
+   Requirements:
+
+   You must use:
+   1 server
+   1 web server (Nginx)
+   1 application server
+   1 application files (your code base)
+   1 database (MySQL)
+   1 domain name foobar.com configured with a www record that points to your server IP 8.8.8.8
+   You must be able to explain some specifics about this infrastructure:
+   What is a server
+   What is the role of the domain name
+   What type of DNS record www is in www.foobar.com
+   What is the role of the web server
+   What is the role of the application server
+   What is the role of the database
+   What is the server using to communicate with the computer of the user requesting the website
+   You must be able to explain what the issues are with this infrastructure:
+   SPOF
+   Downtime when maintenance needed (like deploying new code web server needs to be restarted)
+   Cannot scale if too much incoming traffic
+   Please, remember that everything must be written in English to further your technical ability in a variety of settings.
+
+Server: A server is a computer or system that provides
+resources, data, services, or programs to other computers, known as clients, over a network.
+In our case, the server will host the web server, application server, and database.
+
+
+Domain Name: The domain name is foobar.com.
+It's the address where Internet users can access your website.
+It's used to find and identify computers on the Internet.
+Computers use IP addresses, which are hard to remember,
+so domain names were developed and used to identify entities on the Internet rather than using
+IP addresses.
+
+
+DNS Record: The www in www.foobar.com is a type of DNS record known as a
+CNAME (Canonical Name). It's used to alias one name to another.
+In this case, www.foobar.com is an alias for foobar.com.
+
+
+Web Server: The web server is Nginx.
+It's responsible for accepting HTTP requests from clients (browsers),
+processing them, and responding with HTTP responses.
+It serves static content to a client's browser by reading a file from a disk
+and serving it across the network to a user's web browser.
+
+
+Application Server: The application server is where the application code is executed.
+It's responsible for running your application files (code base).
+It processes the dynamic content of the website,
+executing the code and generating the web page dynamically each time a user requests a page.
+
+Database: The database is MySQL. It's used to store and retrieve data for your website.
+The application server communicates with the database server to
+retrieve the data needed to fulfill user requests.
+Communication: The server communicates with the user's computer via the HTTP/HTTPS protocol.
+When a user wants to visit your website, their browser sends an HTTP request to the server,
+which responds with an HTTP response.
+
+
+SPOF (Single Point of Failure): Since everything is hosted on a single server,
+if that server goes down, the entire website goes down.
+This is a significant risk and can lead to substantial downtime.
+
+Maintenance Downtime: When deploying new code or performing maintenance tasks,
+the web server needs to be restarted, causing downtime.
+Scalability Issues: If the website receives a lot of traffic,
+a single server may not be able to handle the load.
+This setup does not allow for easy scaling to handle increased traffic.
+This is a basic overview of a one server web infrastructure.
+It's a good starting point, but for a production environment,
+you'd likely want to consider a more robust setup to mitigate the issues mentioned above.
