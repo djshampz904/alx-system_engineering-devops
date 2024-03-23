@@ -25,6 +25,20 @@ Q1 A lot of websites are powered by simple web infrastructure, a lot of time it 
    Cannot scale if too much incoming traffic
    Please, remember that everything must be written in English to further your technical ability in a variety of settings.
 
+Q2On a whiteboard, design a three server web infrastructure that hosts the website www.foobar.com.
+
+  Requirements:
+
+  You must add:
+  2 servers
+  1 web server (Nginx)
+  1 application server
+  1 load-balancer (HAproxy)
+  1 set of application files (your code base)
+  1 database (MySQL)
+
+
+
 Server: A server is a computer or system that provides
 resources, data, services, or programs to other computers, known as clients, over a network.
 In our case, the server will host the web server, application server, and database.
