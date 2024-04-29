@@ -11,7 +11,7 @@ printf "server {
         add_header ETag \$upstream_http_etag;
         add_header Accept-Ranges \$upstream_http_accept_ranges;
     }
-    location = /redirect_me {
+    location = /redirect_me/ {
         return 301 http://shvmpz.tech/new_page;
     }
 }\n" "Hello World!" | sudo tee /etc/nginx/sites-available/hello_world;
