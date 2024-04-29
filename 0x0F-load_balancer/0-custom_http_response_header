@@ -7,7 +7,7 @@ sudo rm /etc/nginx/sites-enabled/default;
 printf "server {
     listen 80;
     location / {
-        return 200 \"%s\";
+        return 200 \"%s\\n\";
         add_header ETag \$upstream_http_etag;
         add_header Accept-Ranges \$upstream_http_accept_ranges;
         add_header X-Served-By \$hostname;
