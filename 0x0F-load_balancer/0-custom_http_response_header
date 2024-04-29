@@ -21,7 +21,7 @@ printf "server {
         internal;
     }
 }\n" "Hello World!" | sudo tee /etc/nginx/sites-available/hello_world;
-echo "Ceci n\'est pas une page" | sudo tee /usr/share/nginx/html/custom_404.html;
+pirntf "Ceci n'est pas une page\n" | sudo tee /usr/share/nginx/html/custom_404.html;
 if [ -L /etc/nginx/sites-enabled/hello_world ]; then
     sudo rm /etc/nginx/sites-enabled/hello_world;
 fi
