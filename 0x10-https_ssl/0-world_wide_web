@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Configuring domains
+domain=$1
+myarray=("www" "lb-01" "web-01" 'web-02')
+
+if [ -z "$domain" ]; then
+  echo "Usage: $0 <domain> [subdomain]"
+  exit 1
+fi
+
+# if subdomain not provided
+if [ -z "$2" ]; then
+  for subdomain in "${myarray[@]}"; do
+    answer_string=$(dig "$subdomain"."$domain" | grep -A1 "ANSWER SECTION:" | grep -v "ANSWER SECTION:")
+    ip=$(echo "$answer_string" | awk '{print $NF}')
+    record_type=$(echo "$answer_string" | awk '{print $4}')
+    echo "The subdomain $subdomain is a $record_type record and points to $ip"
+  done
+  exit 0
+fi
+
+# subdomain provided
+sub_domain=$2
+answer_string=$(dig "$sub_domain"."$domain" | grep -A1 "ANSWER SECTION:" | grep -v "ANSWER SECTION:")
+ip=$(echo "$answer_string" | awk '{print $NF}')
+record_type=$(echo "$answer_string" | awk '{print $4}')
+echo "The subdomain $sub_domain is a $record_type record and points to $ip"
