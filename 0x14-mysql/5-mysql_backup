@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Back up database and compress it
+
+if [ -z "$1" ]; then
+  echo "Error: No password provided."
+  exit 1
+fi
+
+mysqldump -u root -p"$1" --all-databases > backup.sql
+
+tar -czf "$(date +%d-%m-%Y).tar.gz" backup.sql
