@@ -1,3 +1,3 @@
-AAPLICATON server
+APPLICATION server
 
 
